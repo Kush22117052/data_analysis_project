@@ -107,7 +107,7 @@ This project enables stakeholders to:
 ## 🙋‍♂️ Author
 
 **Kushagra Kumar Sinha**  
-Pre-final year student, Electrical Engineering  
+Final year student, Electrical Engineering  
 NIT Raipur
 
 ---
