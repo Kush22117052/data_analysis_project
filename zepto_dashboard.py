@@ -9,9 +9,11 @@ st.set_page_config(page_title="Zepto Product Dashboard", layout="wide")
 @st.cache_data
 def load_data():
     df = pd.read_csv("zepto_v2.csv")
-    df['revenue'] = df['discountedSellingPrice'] * df['availableQuantity']
-    df['price_per_gram'] = df['discountedSellingPrice'] / df['weightInGms']
-    df['weight_category'] = df['weightInGms'].apply(lambda x: 'Low' if x < 1000 else ('Medium' if x < 5000 else 'Bulk'))
+    df.columns = df.columns.str.strip().str.lower()  # Normalize column names
+
+    df['revenue'] = df['discountedsellingprice'] * df['availablequantity']
+    df['price_per_gram'] = df['discountedsellingprice'] / df['weightingms']
+    df['weight_category'] = df['weightingms'].apply(lambda x: 'Low' if x < 1000 else ('Medium' if x < 5000 else 'Bulk'))
     return df
 
 df = load_data()
@@ -26,9 +28,9 @@ with tab1:
     st.header("🛒 Stock Overview")
     
     # Inventory Pie
-    stock_count = df['outOfStock'].value_counts().reset_index()
-    stock_count.columns = ['outOfStock', 'Count']
-    fig_stock = px.pie(stock_count, names='outOfStock', values='Count', title='Stock Availability')
+    stock_count = df['outofstock'].value_counts().reset_index()
+    stock_count.columns = ['outofstock', 'count']
+    fig_stock = px.pie(stock_count, names='outofstock', values='count', title='Stock Availability')
     st.plotly_chart(fig_stock, use_container_width=True)
 
     # Categories
@@ -49,15 +51,15 @@ with tab2:
 
     # Top 10 discounted products
     st.subheader("🔥 Top 10 Discounted Products")
-    top_discount = df[['name', 'mrp', 'discountPercent']].drop_duplicates('name').sort_values(by='discountPercent', ascending=False).head(10)
-    fig_discount = px.bar(top_discount, x='name', y='discountPercent', title='Top 10 Discounted Products')
+    top_discount = df[['name', 'mrp', 'discountpercent']].drop_duplicates('name').sort_values(by='discountpercent', ascending=False).head(10)
+    fig_discount = px.bar(top_discount, x='name', y='discountpercent', title='Top 10 Discounted Products')
     st.plotly_chart(fig_discount, use_container_width=True)
 
     # Highest average discount by category
     st.subheader("🏷️ Categories with Highest Average Discount")
-    avg_discount = df.groupby('category')['discountPercent'].mean().reset_index()
-    avg_discount = avg_discount.sort_values(by='discountPercent', ascending=False).head(5)
-    fig_avg_discount = px.bar(avg_discount, x='category', y='discountPercent', title='Top 5 Categories by Avg Discount')
+    avg_discount = df.groupby('category')['discountpercent'].mean().reset_index()
+    avg_discount = avg_discount.sort_values(by='discountpercent', ascending=False).head(5)
+    fig_avg_discount = px.bar(avg_discount, x='category', y='discountpercent', title='Top 5 Categories by Avg Discount')
     st.plotly_chart(fig_avg_discount, use_container_width=True)
 
 # ---------------- WEIGHT ANALYSIS TAB ----------------
@@ -65,7 +67,7 @@ with tab3:
     st.header("⚖️ Weight & Price Analysis")
 
     # Price per gram
-    price_df = df[df['weightInGms'] >= 100].dropna(subset=['price_per_gram'])
+    price_df = df[df['weightingms'] >= 100].dropna(subset=['price_per_gram'])
     fig_ppg = px.histogram(price_df, x='price_per_gram', nbins=50, title='Price per Gram Distribution')
     st.plotly_chart(fig_ppg, use_container_width=True)
 
@@ -76,8 +78,7 @@ with tab3:
     st.plotly_chart(fig_weight, use_container_width=True)
 
     # Total weight by category
-    df['total_weight'] = df['weightInGms'] * df['availableQuantity']
+    df['total_weight'] = df['weightingms'] * df['availablequantity']
     total_weight = df.groupby('category')['total_weight'].sum().reset_index().sort_values(by='total_weight', ascending=False)
     fig_tweight = px.bar(total_weight, x='category', y='total_weight', title='Total Inventory Weight per Category')
     st.plotly_chart(fig_tweight, use_container_width=True)
-
