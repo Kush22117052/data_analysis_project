@@ -8,7 +8,7 @@ st.set_page_config(page_title="Zepto Product Dashboard", layout="wide")
 # Load data
 @st.cache_data
 def load_data():
-    df = pd.read_csv("zepto.csv")
+    df = pd.read_csv("zepto_v2.csv")
     df['revenue'] = df['discountedSellingPrice'] * df['availableQuantity']
     df['price_per_gram'] = df['discountedSellingPrice'] / df['weightInGms']
     df['weight_category'] = df['weightInGms'].apply(lambda x: 'Low' if x < 1000 else ('Medium' if x < 5000 else 'Bulk'))
@@ -80,3 +80,4 @@ with tab3:
     total_weight = df.groupby('category')['total_weight'].sum().reset_index().sort_values(by='total_weight', ascending=False)
     fig_tweight = px.bar(total_weight, x='category', y='total_weight', title='Total Inventory Weight per Category')
     st.plotly_chart(fig_tweight, use_container_width=True)
+
